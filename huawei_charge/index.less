@@ -1,0 +1,127 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+body, html {
+    width: 100%;
+    height: 100%;
+    background: #000;
+    color: #fff;
+    overflow: hidden;
+}
+
+.number {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    text-align: center;
+    z-index: 10;
+}
+
+.container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    margin: auto;
+}
+
+.contrast {
+    filter: contrast(10) hue-rotate(0);
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    animation:  hueRotate 10s infinite linear;
+}
+
+.circle {
+    position: relative;
+    width: 300px;
+    height: 500px;
+    box-sizing: border-box;
+    margin: 0 auto;
+    filter: blur(2px);
+    &::before {
+        content: '';
+        position: absolute;
+        width: 180px;
+        height: 180px;
+        top: 40%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        background-color: #000;
+        z-index: 10;
+    }
+    &::after {
+        content: '';
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        top: 40%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(0);
+        border-radius: 48%;
+        background-color: #00ff6f;
+        animation: rotate 10s infinite linear;
+    }
+}
+
+.bubbles {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 0;
+    width: 150px;
+    height: 40px;
+    border-radius: 100px 100px 0 0;
+    background: #00ff6f;
+    filter: blur(1px);
+}
+
+.ring {
+    list-style: none;
+    position: absolute;
+    border-radius: 50%;
+    background: #00ff6f;
+}
+.ring(@n) when (@n > 0) {
+    .ring_@{n} {
+        width: 10px * sqrt(@n);
+        height: 10px * sqrt(@n);
+        left: 25px * sqrt(@n);
+        top: 50%;
+        transform: translate(-50%, -50%);
+        animation: moveTop 2s*sqrt(@n) ease-in-out 2s*sqrt(@n) infinite;
+    }
+    .ring((@n - 1));
+}
+.ring(15);
+
+@keyframes rotate {
+    50% {
+        border-radius: 45% / 42% 38% 59% 49%;
+    }
+    100% {
+        transform: translate(-50%, -50%) rotate(720deg);
+    }
+}
+
+@keyframes moveTop {
+    90% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -350px);
+    }
+}
+
+@keyframes hueRotate {
+    100% {
+        filter: contrast(15) hue-rotate(360deg);
+    }
+}

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+        <canvas></canvas>
+        <audio src="./source/20181217163127.mp3" crossorigin='anonymous' controls></audio>
+
+
+        <script>
+            let audio = document.querySelector('audio')
+            let cav = document.querySelector('canvas')
+            let ctx = cav.getContext('2d')
+            function initCav() {
+                cav.width = window.innerWidth * devicePixelRatio
+                cav.height = (window.innerHeight / 2) * devicePixelRatio
+            }
+            initCav()
+
+            let isInit = false
+            let arr, analyser
+            audio.onplay = function() {
+                if(isInit) return
+
+                const audCtx = new AudioContext() //音频上下文
+                const source = audCtx.createMediaElementSource(audio) //音频节点
+                analyser = audCtx.createAnalyser() // 分析器
+                analyser.fftSize = 2048
+                arr = new Uint8Array(analyser.frequencyBinCount) // 接收分析器节点的分析数据,因为是对称的，所以取一半的数据
+                source.connect(analyser) // 数据链接到分析器
+                analyser.connect(audCtx.destination) // 分析器链接到输出设备
+                draw()
+
+                isInit = true
+            }
+
+            function draw () {
+                requestAnimationFrame(draw)
+                const { width, height } = cav
+                ctx.clearRect(0, 0, width, height)
+                
+                analyser.getByteFrequencyData(arr)
+
+                const len = arr.length
+                const barWidth = width / len
+                ctx.fillStyle = '#78c5f7'
+                ctx.lineWidth = 2;
+                ctx.lineJoin = "round";
+                // ctx.strokeStyle = '#78c5f7';
+                ctx.beginPath();
+                for (let i = 0; i < len; i++) {
+                    const data = arr[i]
+                    const barHeight = data / 1023 * height * 2
+                    const x = i * barWidth / 2  + width/2
+                    // const x = i * barWidth / 2 + width/4
+                    const x2 = width / 2 - (i)*barWidth / 2
+                    const y = height - barHeight
+                    // if(!i) {
+                    //     ctx.moveTo(x, y);
+                    // } else {
+                    //     ctx.lineTo(x, y);
+                    // }
+                    ctx.fillRect(x, y, barWidth, barHeight)
+                    ctx.fillRect(x2, y, barWidth, barHeight)
+                }
+                ctx.stroke();
+            }
+
+        </script>
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+        }
+        canvas {
+            border-bottom: 1px solid #fff;
+        }
+        audio {
+            position: fixed;
+            top: 52%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+    </style>
+</body>
+</html>
